@@ -1,66 +1,43 @@
 pipeline {
-        agent {
-            label 'master'
-        }
-        tools {
-            maven 'mymaven'
-            jdk 'myjava'
-        }
+    agent {
+        node: 
+          label 'alok-server'
+     }
+    tools {
+
+        maven 'mymaven'
+        jdk 'myjava'
+    }
     stages {
-
-        stage ('Checkout the code') {
-            steps{
-                git branch: 'main', url: 'https://github.com/devopstrainers1/spring-petclinic.git'
-            }
-        }
-
-      stage ('Parallel block') {
-       parallel {   
-        stage ('Code Validate') {
-            steps{
-                sh """
-                mvn validate
-                """
-            
-        }
-        }
-
-        stage ('Code Compile') {
-            steps{
-               
-                sh """
-                mvn compile
-                """
-            
-        }
-        }
-       }
-      }
-
-        stage ('JUNIT Test') {
-            steps{
-                sh """
-                mvn test
-                """
-            }
-        }
-
-        stage ('Packaging') {
+        stage('Check Maven Version') {
             steps {
-                sh """
-                mvn package
-                """
-
+                sh 'mvn --version'
             }
         }
-
-
-      }
-      post {
-
-          always{
-              junit 'target/surefire-reports/**/*.xml'
-          }
-      }   
-
+        stage('Check Java Version') {
+            steps {
+                sh 'java -version'
+            }
+        }
+        stage('Validate the code') {
+            steps {
+                sh 'mvn validate'
+            }
+        }
+         stage('Compile the code') {
+            steps {
+                sh 'mvn compile'
+            }
+        }
+         stage('Test the code') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+        stage('package') {
+            steps {
+                sh 'mvn package'
+            }
+        }
+    }
 }
